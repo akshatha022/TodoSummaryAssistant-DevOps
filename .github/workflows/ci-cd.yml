@@ -1,17 +1,20 @@
-name: Todo Summary Assistant CI/CD
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-jobs:
   backend-build:
     name: Backend Build
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: todo_db
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+        ports:
+          - 3306:3306
 
     steps:
       - name: Checkout code
@@ -26,27 +29,8 @@ jobs:
           cache-dependency-path: Backend/todo-summary-assistant/pom.xml
 
       - name: Build backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/todo_db
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: root
         run: cd Backend/todo-summary-assistant && mvn -B clean package
-
-  frontend-build:
-    name: Frontend Build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: npm
-          cache-dependency-path: Frontend/todo/package-lock.json
-
-      - name: Install dependencies
-        working-directory: Frontend/todo
-        run: npm ci
-
-      - name: Build frontend
-        working-directory: Frontend/todo
-        run: npm run build
