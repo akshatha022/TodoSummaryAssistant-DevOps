@@ -1,17 +1,17 @@
-  backend-build:
-    name: Backend Build
-    runs-on: ubuntu-latest
+backend-build:
+  name: Backend Build
+  runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: maven
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
+        cache: maven
 
-      - name: Build backend
-        run: cd Backend/todo-summary-assistant && ./mvnw clean package
+    - name: Build backend
+      run: cd Backend/todo-summary-assistant && mvn -B clean package
